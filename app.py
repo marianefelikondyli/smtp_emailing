@@ -1,7 +1,5 @@
 from flask import Flask, Response
-import requests
-import smtplib, ssl
-from smtplib import SMTPException
+import smtplib
 import os
 import sys
 from configparser import ConfigParser
@@ -20,11 +18,12 @@ SUBJECT = "my subject"
 TO = "nefeli.kondyli@uphellas.gr"
 FROM = "lala@mydomain.com"
 text = "Text of the email"
+FILE = "C:\\Users\\nefeli.kondyli\\Data Projects\\uninvoiced\\uninvoiced_2022-9-12_2022-9-26.xlsx"
 
 BODY = "\r\n".join((
     "From: %s" % FROM,
     "To: %s" % TO,
-    "Subject: %s" % SUBJECT ,
+    "Subject: %s" % SUBJECT,
     "",
     text
     ))
@@ -64,7 +63,7 @@ def send_email_with_attachment(subject, body_text, to_emails, file_to_attach):
     try:
         with open(file_to_attach, "rb") as fh:
             data = fh.read()
-        attachment.set_payload( data )
+        attachment.set_payload(data)
         encoders.encode_base64(attachment)
         attachment.add_header(*header)
         msg.attach(attachment)
@@ -73,10 +72,8 @@ def send_email_with_attachment(subject, body_text, to_emails, file_to_attach):
         print(msg)
         sys.exit(1)
 
-    emails = to_emails
-
     server = smtplib.SMTP(host)
-    server.sendmail(from_addr, emails, msg.as_string())
+    server.sendmail(from_addr, to_emails, msg.as_string())
     server.quit()
 
 
@@ -90,8 +87,7 @@ def hello():
 @app.route('/test', methods=['POST', 'GET'])
 def test():
     send_email_with_attachment(subject=SUBJECT, body_text=text, to_emails="nefeli.kondyli@uphellas.gr",
-                               file_to_attach=
-                               "C:\\Users\\nefeli.kondyli\\Data Projects\\uninvoiced\\uninvoiced_2022-9-12_2022-9-26.xlsx")
+                               file_to_attach=FILE)
 
 
 if __name__ == "__main__":
